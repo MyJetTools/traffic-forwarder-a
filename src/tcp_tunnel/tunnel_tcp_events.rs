@@ -4,7 +4,7 @@ use my_tcp_sockets::{tcp_connection::SocketConnection, ConnectionEvent, SocketEv
 
 use crate::app::AppContext;
 
-use super::{TunnelTcpContract, TunnelTcpSerializer};
+use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
 pub struct TunnelTcpEvents {
     app: Arc<AppContext>,
@@ -63,7 +63,7 @@ impl TunnelTcpEvents {
 
                 self.app
                     .tunnel_tcp_connection
-                    .send_payload_to_a(id, payload)
+                    .send_payload_to_target(id, payload)
                     .await;
             }
             TunnelTcpContract::Greeting(handshake_phrase) => {

@@ -5,7 +5,8 @@ use tokio::sync::Mutex;
 
 use crate::tcp_listener::TcpConnection;
 
-use super::{TcpTunnelConnectionSingleThreaded, TunnelTcpContract, TunnelTcpSerializer};
+use super::TcpTunnelConnectionSingleThreaded;
+use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
 pub struct TcpTunnelConnection {
     connection_is_established: AtomicBool,
@@ -62,20 +63,12 @@ impl TcpTunnelConnection {
             .store(false, std::sync::atomic::Ordering::SeqCst);
     }
 
-    pub async fn send_payload_to_tunnel(
-        &self,
-        tunnel_connection_id: i32,
-        id: u32,
-        payload: &[u8],
-    ) -> bool {
+    pub async fn send_payload_to_tunnel(&self, id: u32, payload: &[u8]) -> bool {
         let connection_access = self.connection.lock().await;
 
         match &*connection_access {
-            Some(tunnel_connection) => {
-                tunnel_connection
-                    .send_payload(tunnel_connection_id, id, payload.to_vec())
-                    .await;
-
+            Some(tunnel) => {
+                tunnel.send_payload(id, payload.to_vec());
                 return true;
             }
             None => {
@@ -101,10 +94,10 @@ impl TcpTunnelConnection {
     pub async fn disconnect_tcp_connection(&self, connection_id: u32) {
         let mut connection_access = self.connection.lock().await;
 
-        if let Some(tcp_tunnel) = &mut *connection_access {
-            if let Some(removed_connection) = tcp_tunnel.connections.remove(connection_id) {
+        if let Some(tunnel) = &mut *connection_access {
+            if let Some(removed_connection) = tunnel.connections.remove(connection_id) {
                 removed_connection.disconnect();
-                tcp_tunnel.send_disconnect_to_tunnel(connection_id).await;
+                tunnel.send_disconnect_to_tunnel(connection_id);
             }
         }
     }
@@ -122,7 +115,7 @@ impl TcpTunnelConnection {
         }
     }
 
-    pub async fn send_payload_to_a(&self, connection_id: u32, payload: Vec<u8>) {
+    pub async fn send_payload_to_target(&self, connection_id: u32, payload: Vec<u8>) {
         if let Some(connection) = self.get_connection(connection_id).await {
             connection.send_payload(payload)
         }

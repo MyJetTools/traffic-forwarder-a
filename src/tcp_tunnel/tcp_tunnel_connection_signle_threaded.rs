@@ -4,7 +4,7 @@ use my_tcp_sockets::tcp_connection::SocketConnection;
 
 use crate::tcp_listener::TcpListenerConnections;
 
-use super::{TunnelTcpContract, TunnelTcpSerializer};
+use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
 pub struct TcpTunnelConnectionSingleThreaded {
     pub tunnel_connection: Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>>,
@@ -21,17 +21,21 @@ impl TcpTunnelConnectionSingleThreaded {
         }
     }
 
-    pub async fn send_disconnect_to_tunnel(&self, id: u32) {
-        self.tunnel_connection
-            .send(TunnelTcpContract::Disconnected(id))
-            .await;
+    pub fn send_disconnect_to_tunnel(&self, connection_id: u32) {
+        let tunnel_connection = self.tunnel_connection.clone();
+        tokio::spawn(async move {
+            tunnel_connection
+                .send(TunnelTcpContract::Disconnected(connection_id))
+                .await;
+        });
     }
 
-    pub async fn send_payload(&self, tunnel_connection_id: i32, id: u32, payload: Vec<u8>) {
-        if self.tunnel_connection.id == tunnel_connection_id {
-            self.tunnel_connection
+    pub fn send_payload(&self, id: u32, payload: Vec<u8>) {
+        let tunnel_connection = self.tunnel_connection.clone();
+        tokio::spawn(async move {
+            tunnel_connection
                 .send(TunnelTcpContract::Payload { id, payload })
                 .await;
-        }
+        });
     }
 }

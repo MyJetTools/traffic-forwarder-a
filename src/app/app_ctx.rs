@@ -3,10 +3,9 @@ use std::sync::Arc;
 use my_tcp_sockets::TcpServer;
 use rust_extensions::AppStates;
 
-use crate::{
-    settings_model::SettingsModel,
-    tcp_tunnel::{TcpTunnelConnection, TunnelTcpContract, TunnelTcpSerializer},
-};
+use crate::{settings_model::SettingsModel, tcp_tunnel::TcpTunnelConnection};
+
+use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
 pub struct AppContext {
     pub app_states: Arc<AppStates>,

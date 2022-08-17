@@ -90,7 +90,6 @@ async fn listen_to_sockets(
         let app_to_spawn = app.clone();
 
         tokio::spawn(read_loop(
-            tunnel_connection.unwrap(),
             app_to_spawn,
             read_stream,
             buffer_size,
@@ -100,7 +99,6 @@ async fn listen_to_sockets(
 }
 
 async fn read_loop(
-    tunnel_connection_id: i32,
     app: Arc<AppContext>,
     mut read_stream: ReadHalf<TcpStream>,
     buffer_size: usize,
@@ -125,11 +123,7 @@ async fn read_loop(
 
                 if !app
                     .tunnel_tcp_connection
-                    .send_payload_to_tunnel(
-                        tunnel_connection_id,
-                        tcp_connection.id,
-                        &buffer[..read_amount],
-                    )
+                    .send_payload_to_tunnel(tcp_connection.id, &buffer[..read_amount])
                     .await
                 {
                     println!(

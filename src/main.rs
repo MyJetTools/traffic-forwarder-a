@@ -4,10 +4,10 @@ use app::AppContext;
 use settings_model::SettingsModel;
 use tcp_listener::ServiceTcpListener;
 use tcp_tunnel::*;
+use traffic_forwarder_shared::tcp_tunnel::TunnelTcpSerializer;
 
 mod app;
-mod common_deserializers;
-mod common_serializers;
+
 mod settings_model;
 mod tcp_listener;
 mod tcp_tunnel;
