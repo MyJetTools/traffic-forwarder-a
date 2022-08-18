@@ -5,12 +5,12 @@ use tokio::sync::Mutex;
 
 use crate::tcp_listener::TcpConnection;
 
-use super::TcpTunnelConnectionSingleThreaded;
+use super::TcpTunnel;
 use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
 pub struct TcpTunnelConnection {
     connection_is_established: AtomicBool,
-    connection: Mutex<Option<TcpTunnelConnectionSingleThreaded>>,
+    connection: Mutex<Option<TcpTunnel>>,
 }
 
 impl TcpTunnelConnection {
@@ -32,15 +32,8 @@ impl TcpTunnelConnection {
     ) {
         let mut write_access = self.connection.lock().await;
 
-        if let Some(old_tunnel_connection) =
-            write_access.replace(TcpTunnelConnectionSingleThreaded::new(tunnel_connection))
-        {
-            let connections = old_tunnel_connection.connections.remove_all();
-            tokio::spawn(async move {
-                for (_, connection) in connections {
-                    connection.disconnect();
-                }
-            });
+        if let Some(old_tunnel) = write_access.replace(TcpTunnel::new(tunnel_connection)) {
+            old_tunnel.dispose();
         }
 
         self.connection_is_established
@@ -50,13 +43,8 @@ impl TcpTunnelConnection {
     pub async fn tunnel_is_disconnected(&self) {
         let mut write_access = self.connection.lock().await;
 
-        if let Some(old_tunnel_connection) = write_access.take() {
-            let connections = old_tunnel_connection.connections.remove_all();
-            tokio::spawn(async move {
-                for (_, connection) in connections {
-                    connection.disconnect();
-                }
-            });
+        if let Some(old_tunnel) = write_access.take() {
+            old_tunnel.dispose();
         }
 
         self.connection_is_established

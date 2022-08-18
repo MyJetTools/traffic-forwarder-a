@@ -6,18 +6,26 @@ use crate::tcp_listener::TcpListenerConnections;
 
 use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
-pub struct TcpTunnelConnectionSingleThreaded {
+pub struct TcpTunnel {
     pub tunnel_connection: Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>>,
     pub connections: TcpListenerConnections,
 }
 
-impl TcpTunnelConnectionSingleThreaded {
+impl TcpTunnel {
     pub fn new(
         tunnel_connection: Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>>,
     ) -> Self {
         Self {
             tunnel_connection,
             connections: TcpListenerConnections::new(),
+        }
+    }
+
+    pub fn dispose(self) {
+        let connections = self.connections.remove_all();
+
+        for (_, connection) in connections {
+            connection.disconnect();
         }
     }
 

@@ -1,7 +1,6 @@
 use std::{net::SocketAddr, sync::Arc};
 
 use app::AppContext;
-use settings_model::SettingsModel;
 use tcp_listener::ServiceTcpListener;
 use tcp_tunnel::*;
 use traffic_forwarder_shared::tcp_tunnel::TunnelTcpSerializer;
@@ -14,7 +13,8 @@ mod tcp_tunnel;
 
 #[tokio::main]
 async fn main() {
-    let settings = SettingsModel::load();
+    let settings = crate::settings_model::SettingsModel::load(".traffic-forwarder-a").await;
+
     let app = AppContext::new(settings);
 
     let app = Arc::new(app);
@@ -30,7 +30,7 @@ async fn main() {
         )
         .await;
 
-    for service_settings in &app.settings.services {
+    for service_settings in &app.settings.get_serives() {
         service_sockets.push(ServiceTcpListener::new(
             app.clone(),
             SocketAddr::from(([0, 0, 0, 0], service_settings.port)),
