@@ -103,19 +103,14 @@ async fn read_loop(
     target_tcp_connection: Arc<TargetTcpConnection>,
 ) {
     let mut buffer: Vec<u8> = Vec::with_capacity(buffer_size);
+    unsafe {
+        buffer.set_len(buffer_size);
+    }
 
     loop {
-        unsafe {
-            buffer.set_len(buffer_size);
-        }
-
         match read_stream.read(&mut buffer).await {
             Ok(read_amount) => {
                 if read_amount == 0 {
-                    println!(
-                        "Socket {} got 0 bytes. Stopping read_stream",
-                        target_tcp_connection.id,
-                    );
                     break;
                 }
 

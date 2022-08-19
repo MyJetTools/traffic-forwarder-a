@@ -27,13 +27,19 @@ impl TunnelTcpEvents {
             TunnelTcpContract::Pong => {
                 //B to A packet. Do nothing.
             }
-            TunnelTcpContract::ConnectTo { id: _, url: _ } => {
+            TunnelTcpContract::ConnectTo {
+                id: _,
+                remote_host_port: _,
+            } => {
                 //B to A packet. Do nothing.
             }
             TunnelTcpContract::Connected(id) => {
                 // Confirmation that connection is established on b side.
 
-                println!("Connection {} is established on side b", id);
+                self.app
+                    .tunnel_tcp_connection
+                    .confirm_target_connection(id)
+                    .await;
             }
             TunnelTcpContract::CanNotConnect { id, reason } => {
                 // Confirmation that connection can not be established on b side.
@@ -50,8 +56,6 @@ impl TunnelTcpEvents {
             }
             TunnelTcpContract::DisconnectedFromSideA(id) => {
                 // Socket is disconnected on b side
-
-                println!("Connection {} is disconnected from side a", id);
 
                 self.app
                     .tunnel_tcp_connection
