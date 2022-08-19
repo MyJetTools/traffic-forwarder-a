@@ -45,7 +45,7 @@ impl TunnelTcpEvents {
 
                 self.app
                     .tunnel_tcp_connection
-                    .disconnect_tcp_connection(id)
+                    .target_connection_is_disconnected(id)
                     .await;
             }
             TunnelTcpContract::Disconnected(id) => {
@@ -55,7 +55,7 @@ impl TunnelTcpEvents {
 
                 self.app
                     .tunnel_tcp_connection
-                    .disconnect_tcp_connection(id)
+                    .target_connection_is_disconnected(id)
                     .await;
             }
             TunnelTcpContract::Payload { id, payload } => {
@@ -70,7 +70,7 @@ impl TunnelTcpEvents {
                 if self.app.settings.tunnel_hand_shake_phrase == handshake_phrase {
                     self.app
                         .tunnel_tcp_connection
-                        .new_connection_is_established(connection)
+                        .tunnel_connection_is_established(connection)
                         .await
                 } else {
                     println!("Handshake phrase is not correct. Connection is closed.");

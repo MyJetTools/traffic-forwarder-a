@@ -1,14 +1,14 @@
 use std::{net::SocketAddr, sync::Arc};
 
 use app::AppContext;
-use tcp_listener::ServiceTcpListener;
+use target_tcp_listener::{TargetTcpCallbacks, TargetTcpListener};
 use tcp_tunnel::*;
 use traffic_forwarder_shared::tcp_tunnel::TunnelTcpSerializer;
 
 mod app;
 
 mod settings_model;
-mod tcp_listener;
+mod target_tcp_listener;
 mod tcp_tunnel;
 
 #[tokio::main]
@@ -31,7 +31,7 @@ async fn main() {
         .await;
 
     for service_settings in &app.settings.get_serives() {
-        service_sockets.push(ServiceTcpListener::new(
+        service_sockets.push(TargetTcpListener::new(
             app.clone(),
             SocketAddr::from(([0, 0, 0, 0], service_settings.port)),
             service_settings.remote_host.clone(),
@@ -39,7 +39,10 @@ async fn main() {
         ));
     }
     for service_socket in &service_sockets {
-        service_socket.start();
+        service_socket.start(Arc::new(TargetTcpCallbacks::new(
+            app.clone(),
+            service_socket.remote_host.clone(),
+        )));
     }
 
     app.app_states.wait_until_shutdown().await;

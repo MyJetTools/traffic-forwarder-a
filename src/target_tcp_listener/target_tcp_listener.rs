@@ -5,16 +5,18 @@ use tokio::{
     net::{TcpListener, TcpStream},
 };
 
-use crate::{app::AppContext, tcp_listener::TcpConnection};
+use crate::{app::AppContext, target_tcp_listener::TargetTcpConnection};
 
-pub struct ServiceTcpListener {
+use super::TargetTcpCallbacks;
+
+pub struct TargetTcpListener {
     addr: SocketAddr,
-    remote_host: String,
+    pub remote_host: String,
     buffer_size: usize,
     app: Arc<AppContext>,
 }
 
-impl ServiceTcpListener {
+impl TargetTcpListener {
     pub fn new(
         app: Arc<AppContext>,
         addr: SocketAddr,
@@ -29,12 +31,13 @@ impl ServiceTcpListener {
         }
     }
 
-    pub fn start(&self) {
+    pub fn start(&self, callbacks: Arc<TargetTcpCallbacks>) {
         tokio::spawn(listen_to_sockets(
             self.app.clone(),
             self.addr.clone(),
             self.remote_host.clone(),
             self.buffer_size,
+            callbacks,
         ));
     }
 }
@@ -44,6 +47,7 @@ async fn listen_to_sockets(
     addr: SocketAddr,
     remote_host: String,
     buffer_size: usize,
+    callbacks: Arc<TargetTcpCallbacks>,
 ) {
     let listener = TcpListener::bind(addr).await.unwrap();
 
@@ -67,42 +71,36 @@ async fn listen_to_sockets(
                 socket_addr
             );
             let _shut_down_result = tcp_stream.shutdown().await;
+            continue;
         }
 
         socket_id += 1;
         let (read_stream, write_stream) = tokio::io::split(tcp_stream);
 
-        let tcp_connection = Arc::new(TcpConnection::new(socket_id, write_stream));
+        let target_tcp_connection = Arc::new(TargetTcpConnection::new(socket_id, write_stream));
 
-        let tunnel_connection = app
-            .tunnel_tcp_connection
-            .new_tcp_connection(&tcp_connection)
-            .await;
-
-        if tunnel_connection.is_none() {
+        if !callbacks.on_new_connection(&target_tcp_connection).await {
             println!(
-                "Tunnel connection went down. Dropping connection {} with id {}",
-                socket_addr, socket_id
+                "Tunnel connection is dropped. Dropping target connection {}",
+                socket_addr
             );
-            tcp_connection.disconnect();
+            continue;
         }
 
-        let app_to_spawn = app.clone();
-
         tokio::spawn(read_loop(
-            app_to_spawn,
             read_stream,
             buffer_size,
-            tcp_connection,
+            callbacks.clone(),
+            target_tcp_connection,
         ));
     }
 }
 
 async fn read_loop(
-    app: Arc<AppContext>,
     mut read_stream: ReadHalf<TcpStream>,
     buffer_size: usize,
-    tcp_connection: Arc<TcpConnection>,
+    callbacks: Arc<TargetTcpCallbacks>,
+    target_tcp_connection: Arc<TargetTcpConnection>,
 ) {
     let mut buffer: Vec<u8> = Vec::with_capacity(buffer_size);
 
@@ -116,19 +114,18 @@ async fn read_loop(
                 if read_amount == 0 {
                     println!(
                         "Socket {} got 0 bytes. Stopping read_stream",
-                        tcp_connection.id,
+                        target_tcp_connection.id,
                     );
                     break;
                 }
 
-                if !app
-                    .tunnel_tcp_connection
-                    .send_payload_to_tunnel(tcp_connection.id, &buffer[..read_amount])
+                if !callbacks
+                    .on_new_payload(&target_tcp_connection, buffer[..read_amount].to_vec())
                     .await
                 {
                     println!(
-                        "Tunnel has not connection anymore. Stopping read_stream of socket {}",
-                        tcp_connection.id,
+                        "Tunnel is disconnected. Stopping read_stream for target connection {}",
+                        target_tcp_connection.id
                     );
                     break;
                 }
@@ -143,7 +140,5 @@ async fn read_loop(
         }
     }
 
-    app.tunnel_tcp_connection
-        .disconnect_tcp_connection(tcp_connection.id)
-        .await;
+    callbacks.on_new_disconnection(target_tcp_connection).await;
 }

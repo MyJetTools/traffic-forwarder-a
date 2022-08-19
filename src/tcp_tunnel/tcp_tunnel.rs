@@ -2,13 +2,13 @@ use std::sync::Arc;
 
 use my_tcp_sockets::tcp_connection::SocketConnection;
 
-use crate::tcp_listener::TcpListenerConnections;
+use crate::target_tcp_listener::TargetTcpListenerConnections;
 
 use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
 pub struct TcpTunnel {
-    pub tunnel_connection: Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>>,
-    pub connections: TcpListenerConnections,
+    tunnel_connection: Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>>,
+    pub connections: TargetTcpListenerConnections,
 }
 
 impl TcpTunnel {
@@ -17,7 +17,7 @@ impl TcpTunnel {
     ) -> Self {
         Self {
             tunnel_connection,
-            connections: TcpListenerConnections::new(),
+            connections: TargetTcpListenerConnections::new(),
         }
     }
 
@@ -29,21 +29,9 @@ impl TcpTunnel {
         }
     }
 
-    pub fn send_disconnect_to_tunnel(&self, connection_id: u32) {
-        let tunnel_connection = self.tunnel_connection.clone();
-        tokio::spawn(async move {
-            tunnel_connection
-                .send(TunnelTcpContract::Disconnected(connection_id))
-                .await;
-        });
-    }
-
-    pub fn send_payload(&self, id: u32, payload: Vec<u8>) {
-        let tunnel_connection = self.tunnel_connection.clone();
-        tokio::spawn(async move {
-            tunnel_connection
-                .send(TunnelTcpContract::Payload { id, payload })
-                .await;
-        });
+    pub fn get_tunnel_connection(
+        &self,
+    ) -> Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>> {
+        self.tunnel_connection.clone()
     }
 }

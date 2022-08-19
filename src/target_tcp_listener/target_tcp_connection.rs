@@ -5,13 +5,13 @@ use tokio::io::{AsyncWriteExt, WriteHalf};
 use tokio::net::TcpStream;
 use tokio::sync::mpsc::{UnboundedReceiver, UnboundedSender};
 
-pub struct TcpConnection {
+pub struct TargetTcpConnection {
     pub id: u32,
     sender: UnboundedSender<Option<Vec<u8>>>,
     disconnected: AtomicBool,
 }
 
-impl TcpConnection {
+impl TargetTcpConnection {
     pub fn new(id: u32, tcp_stream: WriteHalf<TcpStream>) -> Self {
         let (sender, receiver) = tokio::sync::mpsc::unbounded_channel();
 
