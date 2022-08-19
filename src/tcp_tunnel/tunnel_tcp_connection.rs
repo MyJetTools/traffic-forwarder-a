@@ -8,6 +8,12 @@ use crate::target_tcp_listener::TargetTcpConnection;
 use super::TcpTunnel;
 use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
+pub enum DisconnectReason {
+    CanNotConnect,
+    DisconnectedFromSideA,
+    DisconnectedFromSideB,
+}
+
 pub struct TcpTunnelConnection {
     connection_is_established: AtomicBool,
     tunnel: Mutex<Option<TcpTunnel>>,
@@ -109,7 +115,11 @@ impl TcpTunnelConnection {
         }
     }
 
-    pub async fn target_connection_is_disconnected(&self, connection_id: u32) {
+    pub async fn target_connection_is_disconnected(
+        &self,
+        connection_id: u32,
+        reason: DisconnectReason,
+    ) {
         let tunnel_connection = {
             let mut tunnel_access = self.tunnel.lock().await;
 
@@ -125,10 +135,12 @@ impl TcpTunnelConnection {
             }
         };
 
-        if let Some(tunnel_connection) = tunnel_connection {
-            tunnel_connection
-                .send(TunnelTcpContract::Disconnected(connection_id))
-                .await;
+        if let DisconnectReason::DisconnectedFromSideA = reason {
+            if let Some(tunnel_connection) = tunnel_connection {
+                tunnel_connection
+                    .send(TunnelTcpContract::DisconnectedFromSideA(connection_id))
+                    .await;
+            }
         }
     }
 

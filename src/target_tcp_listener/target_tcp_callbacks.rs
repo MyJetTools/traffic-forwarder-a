@@ -26,7 +26,10 @@ impl TargetTcpCallbacks {
     pub async fn on_new_disconnection(&self, tcp_connection: Arc<TargetTcpConnection>) {
         self.app
             .tunnel_tcp_connection
-            .target_connection_is_disconnected(tcp_connection.id)
+            .target_connection_is_disconnected(
+                tcp_connection.id,
+                crate::tcp_tunnel::DisconnectReason::DisconnectedFromSideA,
+            )
             .await;
     }
     pub async fn on_new_payload(

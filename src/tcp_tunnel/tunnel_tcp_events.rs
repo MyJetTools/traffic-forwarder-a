@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use my_tcp_sockets::{tcp_connection::SocketConnection, ConnectionEvent, SocketEventCallback};
 
-use crate::app::AppContext;
+use crate::{app::AppContext, tcp_tunnel::DisconnectReason};
 
 use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
@@ -45,17 +45,28 @@ impl TunnelTcpEvents {
 
                 self.app
                     .tunnel_tcp_connection
-                    .target_connection_is_disconnected(id)
+                    .target_connection_is_disconnected(id, DisconnectReason::CanNotConnect)
                     .await;
             }
-            TunnelTcpContract::Disconnected(id) => {
+            TunnelTcpContract::DisconnectedFromSideA(id) => {
                 // Socket is disconnected on b side
 
-                println!("Connection {} is disconnected", id);
+                println!("Connection {} is disconnected from side a", id);
 
                 self.app
                     .tunnel_tcp_connection
-                    .target_connection_is_disconnected(id)
+                    .target_connection_is_disconnected(id, DisconnectReason::DisconnectedFromSideA)
+                    .await;
+            }
+
+            TunnelTcpContract::DisconnectedFromSideB(id) => {
+                // Socket is disconnected on b side
+
+                println!("Connection {} is disconnected size b", id);
+
+                self.app
+                    .tunnel_tcp_connection
+                    .target_connection_is_disconnected(id, DisconnectReason::DisconnectedFromSideB)
                     .await;
             }
             TunnelTcpContract::Payload { id, payload } => {
