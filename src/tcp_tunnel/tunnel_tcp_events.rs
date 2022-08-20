@@ -38,7 +38,7 @@ impl TunnelTcpEvents {
 
                 self.app
                     .tunnel_tcp_connection
-                    .confirm_target_connection(id)
+                    .confirm_target_connection(id, self.app.statistics.clone())
                     .await;
             }
             TunnelTcpContract::CanNotConnect { id, reason } => {
@@ -75,6 +75,12 @@ impl TunnelTcpEvents {
             }
             TunnelTcpContract::Payload { id, payload } => {
                 // We have payload from b to a;
+
+                self.app
+                    .statistics
+                    .traffic_history
+                    .incoming_accumulator
+                    .append(payload.len());
 
                 self.app
                     .tunnel_tcp_connection

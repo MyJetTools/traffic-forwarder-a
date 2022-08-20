@@ -1,13 +1,16 @@
-use std::{net::SocketAddr, sync::Arc};
+use std::{net::SocketAddr, sync::Arc, time::Duration};
 
 use app::AppContext;
+use rust_extensions::MyTimer;
 use target_tcp_listener::{TargetTcpCallbacks, TargetTcpListener};
 use tcp_tunnel::*;
 use traffic_forwarder_shared::tcp_tunnel::TunnelTcpSerializer;
 
 mod app;
-
+mod background;
+mod http;
 mod settings_model;
+mod statistics;
 mod target_tcp_listener;
 mod tcp_tunnel;
 
@@ -44,6 +47,17 @@ async fn main() {
             service_socket.remote_host.clone(),
         )));
     }
+
+    let mut timer_1s = MyTimer::new(Duration::from_secs(1));
+
+    timer_1s.register_timer(
+        "OneSecTimer",
+        Arc::new(crate::background::OneSecondTimer::new(app.clone())),
+    );
+
+    timer_1s.start(app.app_states.clone(), my_logger::LOGGER.clone());
+
+    crate::http::start_http_server(&app, app.settings.http_port);
 
     app.app_states.wait_until_shutdown().await;
 }

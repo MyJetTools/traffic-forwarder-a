@@ -3,7 +3,7 @@ use std::sync::{atomic::AtomicBool, Arc};
 use my_tcp_sockets::tcp_connection::SocketConnection;
 use tokio::sync::Mutex;
 
-use crate::target_tcp_listener::TargetTcpConnection;
+use crate::{statistics::Statistics, target_tcp_listener::TargetTcpConnection};
 
 use super::{TcpTunnelInner, TunnelConnectionToSendPayload};
 use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
@@ -161,13 +161,13 @@ impl TcpTunnel {
         }
     }
 
-    pub async fn confirm_target_connection(&self, connection_id: u32) {
+    pub async fn confirm_target_connection(&self, connection_id: u32, statistics: Arc<Statistics>) {
         let payloads_to_send = {
             let mut tunnel_access = self.tunnel.lock().await;
 
             if let Some(tunnel_access) = tunnel_access.as_mut() {
                 tunnel_access
-                    .confirm_target_connection_is_connected(connection_id)
+                    .confirm_target_connection_is_connected(connection_id, statistics)
                     .await
             } else {
                 None

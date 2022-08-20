@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use my_tcp_sockets::tcp_connection::SocketConnection;
 
-use crate::target_tcp_listener::TargetTcpListenerConnections;
+use crate::{statistics::Statistics, target_tcp_listener::TargetTcpListenerConnections};
 
 use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
@@ -60,6 +60,7 @@ impl TcpTunnelInner {
     pub async fn confirm_target_connection_is_connected(
         &mut self,
         connection_id: u32,
+        statistics: Arc<Statistics>,
     ) -> Option<(Arc<TunnelConnectionToSendPayload>, Vec<Vec<u8>>)> {
         if let Some(old_connection) = self
             .tunnel_connections_to_send_payload
@@ -69,6 +70,7 @@ impl TcpTunnelInner {
 
             let connection = Arc::new(TunnelConnectionToSendPayload::create_initialized(
                 self.tunnel_connection.clone(),
+                statistics,
             ));
 
             self.tunnel_connections_to_send_payload

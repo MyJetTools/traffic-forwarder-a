@@ -5,9 +5,14 @@ use rust_extensions::lazy::LazyVec;
 use tokio::sync::Mutex;
 use traffic_forwarder_shared::tcp_tunnel::{TunnelTcpContract, TunnelTcpSerializer};
 
+use crate::statistics::Statistics;
+
 pub enum TunnelConnectionToSendPayload {
     NotInitialized(Mutex<Option<LazyVec<Vec<u8>>>>),
-    Initialized(Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>>),
+    Initialized {
+        socket: Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>>,
+        statistics: Arc<Statistics>,
+    },
 }
 
 impl TunnelConnectionToSendPayload {
@@ -19,7 +24,12 @@ impl TunnelConnectionToSendPayload {
             TunnelConnectionToSendPayload::NotInitialized(payloads) => {
                 payloads.lock().await.as_mut().unwrap().add(payload);
             }
-            TunnelConnectionToSendPayload::Initialized(socket) => {
+            TunnelConnectionToSendPayload::Initialized { socket, statistics } => {
+                statistics
+                    .traffic_history
+                    .outcoming_accumulator
+                    .append(payload.len());
+
                 socket
                     .send(TunnelTcpContract::Payload {
                         id: connection_id,
@@ -37,13 +47,17 @@ impl TunnelConnectionToSendPayload {
                 let result = write_access.take().unwrap();
                 result.get_result()
             }
-            TunnelConnectionToSendPayload::Initialized(_) => None,
+            TunnelConnectionToSendPayload::Initialized {
+                socket: _,
+                statistics: _,
+            } => None,
         }
     }
 
     pub fn create_initialized(
-        tunnel_socket: Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>>,
+        socket: Arc<SocketConnection<TunnelTcpContract, TunnelTcpSerializer>>,
+        statistics: Arc<Statistics>,
     ) -> Self {
-        Self::Initialized(tunnel_socket)
+        Self::Initialized { socket, statistics }
     }
 }

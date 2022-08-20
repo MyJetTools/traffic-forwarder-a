@@ -6,6 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+my-http-server = { branch = "0.2.6", git = "https://github.com/MyJetTools/my-http-server.git", features = [
+    "full",
+] }
+my-http-server-controllers = { branch = "0.2.6", git = "https://github.com/MyJetTools/my-http-server-controllers.git" }
+my-http-server-swagger = { branch = "0.2.6", git = "https://github.com/MyJetTools/my-http-server-swagger.git" }
+
 my-tcp-sockets = { branch = "0.1.6", git = "https://github.com/MyJetTools/my-tcp-sockets.git" }
 rust-extensions = { branch = "0.1.1", git = "https://github.com/MyJetTools/rust-extensions.git" }
 traffic-forwarder-shared = { branch = "0.1.0", git = "https://github.com/MyJetTools/traffic-forwarder-shared.git" }
@@ -19,3 +25,4 @@ async-trait = "*"
 serde = "*"
 serde_yaml = "*"
 serde_derive = "*"
+uuid = { version = "*", features = ["serde", "v4"] }

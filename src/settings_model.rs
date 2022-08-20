@@ -12,13 +12,15 @@ pub struct SettingsModel {
     pub services: Vec<String>,
     #[serde(rename = "TunnelHandShakePhrase")]
     pub tunnel_hand_shake_phrase: String,
-    #[serde(rename = "Port")]
-    pub port: u16,
+    #[serde(rename = "TunnelPort")]
+    pub tunnel_port: u16,
+    #[serde(rename = "HttpPort")]
+    pub http_port: u16,
 }
 
 impl SettingsModel {
     pub fn get_tunnel_addr(&self) -> SocketAddr {
-        SocketAddr::from(([0, 0, 0, 0], self.port))
+        SocketAddr::from(([0, 0, 0, 0], self.tunnel_port))
     }
 
     pub fn get_serives(&self) -> Vec<ServiceSettings> {
