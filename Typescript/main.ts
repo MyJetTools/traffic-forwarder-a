@@ -58,11 +58,14 @@ class main {
         this.requested = true;
 
         $.ajax({ url: '/api/status', type: 'get' })
-            .then((result: IStatusContract) => {
+            .then((response: IStatusContract) => {
                 this.requested = false;
 
+                this.layoutElement.innerHTML = HtmlTunnelTraffic.render(response)
+                    + HtmlServices.generate(response);
 
-                HtmlStatusBar.updateStatusbar(result);
+
+                HtmlStatusBar.updateStatusbar(response);
 
             }).fail(() => {
                 this.requested = false;

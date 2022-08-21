@@ -36,6 +36,8 @@ impl GetAction for IndexAction {
                 <script src="/js/jquery.js"></script>
                 <script src="/js/HtmlStatusBar.js"></script>
                 <script src="/js/HtmlStaticElement.js"></script>
+                <script src="/js/HtmlServices.js"></script>
+                <script src="/js/HtmlTunnelTraffic.js"></script>
                 <script src="/js/HtmlMain.js"></script>
                 <script src="/js/main.js"></script>
                 </head><body></body></html>"###,

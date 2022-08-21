@@ -1,1 +1,1 @@
-{"version":3,"file":"HtmlTunnelTraffic.js","sourceRoot":"","sources":["../../Typescript/HtmlTunnelTraffic.ts"],"names":[],"mappings":"AAAA,MAAM,iBAAiB;IAEZ,MAAM,CAAC,MAAM,CAAC,MAAuB;QAExC,OAAO,gBAAgB,CAAC;IAE5B,CAAC;CAEJ"}
+{"version":3,"file":"HtmlTunnelTraffic.js","sourceRoot":"","sources":["../../Typescript/HtmlTunnelTraffic.ts"],"names":[],"mappings":"AAAA,MAAM,iBAAiB;IAEZ,MAAM,CAAC,MAAM,CAAC,MAAuB;QAExC,OAAO,yBAAyB,CAAC;IAErC,CAAC;CAEJ"}

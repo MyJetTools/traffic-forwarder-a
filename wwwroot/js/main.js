@@ -26,9 +26,11 @@ class main {
             return;
         this.requested = true;
         $.ajax({ url: '/api/status', type: 'get' })
-            .then((result) => {
+            .then((response) => {
             this.requested = false;
-            HtmlStatusBar.updateStatusbar(result);
+            this.layoutElement.innerHTML = HtmlTunnelTraffic.render(response)
+                + HtmlServices.generate(response);
+            HtmlStatusBar.updateStatusbar(response);
         }).fail(() => {
             this.requested = false;
             HtmlStatusBar.updateOffline();

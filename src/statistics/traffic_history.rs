@@ -34,10 +34,13 @@ impl TrafficHistory {
         if history_write_access.len() >= MAX_ELEMENTS_AMOUNT {
             history_write_access.remove(0);
         }
-        history_write_access.push(TrafficHistoryItem {
-            incoming,
-            outcoming,
-        });
+
+        if incoming > 0 || outcoming > 0 || history_write_access.len() > 0 {
+            history_write_access.push(TrafficHistoryItem {
+                incoming,
+                outcoming,
+            });
+        }
     }
 
     pub async fn get_traffic_history(&self) -> Vec<TrafficHistoryItem> {
