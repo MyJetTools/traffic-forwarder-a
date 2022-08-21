@@ -33,17 +33,19 @@ async fn main() {
         )
         .await;
 
-    for service_settings in &app.settings.get_serives() {
+    for service_settings in app.settings.get_serives() {
         service_sockets.push(TargetTcpListener::new(
             app.clone(),
             SocketAddr::from(([0, 0, 0, 0], service_settings.port)),
-            service_settings.remote_host.clone(),
+            service_settings.port,
+            service_settings.remote_host,
             1024 * 1024 * 5,
         ));
     }
     for service_socket in &service_sockets {
         service_socket.start(Arc::new(TargetTcpCallbacks::new(
             app.clone(),
+            service_socket.listening_port,
             service_socket.remote_host.clone(),
         )));
     }

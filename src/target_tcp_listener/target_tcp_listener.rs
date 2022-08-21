@@ -12,6 +12,7 @@ use super::TargetTcpCallbacks;
 pub struct TargetTcpListener {
     addr: SocketAddr,
     pub remote_host: String,
+    pub listening_port: u16,
     buffer_size: usize,
     app: Arc<AppContext>,
 }
@@ -20,6 +21,7 @@ impl TargetTcpListener {
     pub fn new(
         app: Arc<AppContext>,
         addr: SocketAddr,
+        listening_port: u16,
         remote_host: String,
         buffer_size: usize,
     ) -> Self {
@@ -28,6 +30,7 @@ impl TargetTcpListener {
             remote_host,
             buffer_size,
             app,
+            listening_port,
         }
     }
 

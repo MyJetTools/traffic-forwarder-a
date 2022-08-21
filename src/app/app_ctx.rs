@@ -21,12 +21,12 @@ pub struct AppContext {
 impl AppContext {
     pub fn new(settings: SettingsModel) -> Self {
         Self {
+            statistics: Arc::new(Statistics::new(&settings)),
             tunnel_tcp_server: TcpServer::new("TcpTunnel".to_string(), settings.get_tunnel_addr()),
             app_states: Arc::new(AppStates::create_initialized()),
             settings,
             tunnel_tcp_connection: TcpTunnel::new(),
             process_id: uuid::Uuid::new_v4().to_string(),
-            statistics: Arc::new(Statistics::new()),
         }
     }
 }
