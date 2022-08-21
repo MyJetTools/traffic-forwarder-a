@@ -7,9 +7,10 @@ gulp.task('default', function () {
     return gulp
         .src(['./wwwroot/js/HtmlStatusBar.js',
             './wwwroot/js/HtmlStaticElement.js',
-            './wwwroot/js/HtmlServices.js',
+            './wwwroot/js/HtmlGraph.js',
             './wwwroot/js/HtmlServices.js',
             './wwwroot/js/HtmlTunnelTraffic.js',
+            './wwwroot/js/HtmlServices.js',
             './wwwroot/js/HtmlMain.js',
             './wwwroot/js/main.js'])
         .pipe(minifyjs())

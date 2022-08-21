@@ -2,8 +2,6 @@
 class Utils {
 
 
-
-
     public static filterIt(line: string, filterPhrase: string): boolean {
         if (filterPhrase == "")
             return false;
@@ -39,7 +37,7 @@ class Utils {
     }
 
 
-    public static format_bytes(n: number): string {
+    public static formatBytes(n: number): string {
         if (n < 1024) {
             return n.toFixed(2) + "b";
         }

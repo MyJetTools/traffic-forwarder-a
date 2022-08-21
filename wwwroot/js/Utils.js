@@ -24,7 +24,7 @@ class Utils {
     static formatNumber(n) {
         return n.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
     }
-    static format_bytes(n) {
+    static formatBytes(n) {
         if (n < 1024) {
             return n.toFixed(2) + "b";
         }
