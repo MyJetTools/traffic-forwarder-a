@@ -1,30 +1,33 @@
-class Utils {
-    static filterIt(line, filterPhrase) {
+var Utils = /** @class */ (function () {
+    function Utils() {
+    }
+    Utils.filterIt = function (line, filterPhrase) {
         if (filterPhrase == "")
             return false;
         return line.indexOf(filterPhrase) == -1;
-    }
-    static copyToClipboardHtml(text) {
+    };
+    Utils.copyToClipboardHtml = function (text) {
         return ' style="cursor:pointer" clipboard=' + text + ' onclick="Utils.copyToClipboard()"';
-    }
-    static copyToClipboard(el) {
-        let attr = el.attributes.getNamedItem('clipboard');
+    };
+    Utils.copyToClipboard = function (el) {
+        var attr = el.attributes.getNamedItem('clipboard');
         if (attr) {
             navigator.clipboard.writeText(attr.value);
         }
-    }
-    static getMax(c) {
-        let result = 0;
-        for (const i of c) {
+    };
+    Utils.getMax = function (c) {
+        var result = 0;
+        for (var _i = 0, c_1 = c; _i < c_1.length; _i++) {
+            var i = c_1[_i];
             if (i > result)
                 result = i;
         }
         return result;
-    }
-    static formatNumber(n) {
+    };
+    Utils.formatNumber = function (n) {
         return n.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
-    }
-    static formatBytes(n) {
+    };
+    Utils.formatBytes = function (n) {
         if (n < 1024) {
             return n.toFixed(2) + "b";
         }
@@ -38,8 +41,8 @@ class Utils {
         }
         n = n / 1024;
         return n.toFixed(2) + "Gb";
-    }
-    static format_duration(micros) {
+    };
+    Utils.format_duration = function (micros) {
         if (micros == 0)
             return "0";
         if (micros < 1000) {
@@ -49,6 +52,7 @@ class Utils {
             return (micros / 1000).toFixed(3) + "ms";
         }
         return (micros / 1000000).toFixed(3) + "s";
-    }
-}
+    };
+    return Utils;
+}());
 //# sourceMappingURL=Utils.js.map

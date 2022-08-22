@@ -1,13 +1,14 @@
-class HtmlStaticElement {
-    constructor(el, renderHtml) {
+var HtmlStaticElement = /** @class */ (function () {
+    function HtmlStaticElement(el, renderHtml) {
         this.el = el;
         this.renderHtml = renderHtml;
     }
-    update(value) {
+    HtmlStaticElement.prototype.update = function (value) {
         if (this.value === undefined || this.value != value) {
             this.value = value;
             this.el.innerHTML = this.renderHtml(value);
         }
-    }
-}
+    };
+    return HtmlStaticElement;
+}());
 //# sourceMappingURL=HtmlStaticElement.js.map

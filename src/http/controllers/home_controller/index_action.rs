@@ -28,7 +28,7 @@ impl GetAction for IndexAction {
     }
 
     async fn handle_request(&self, _: &mut HttpContext) -> Result<HttpOkResult, HttpFailResult> {
-        if cfg!(debug_assertions) {
+        if !cfg!(debug_assertions) {
             let content = format!(
                 r###"<html><head><title>{} traffic-forwarder-a</title>
                 <link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />

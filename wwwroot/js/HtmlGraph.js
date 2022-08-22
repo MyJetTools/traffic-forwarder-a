@@ -1,9 +1,12 @@
-class HtmlGraph {
-    static getMax(traffics) {
+var HtmlGraph = /** @class */ (function () {
+    function HtmlGraph() {
+    }
+    HtmlGraph.getMax = function (traffics) {
         if (traffics.length == 0)
             return 0;
-        let max = traffics[0].i;
-        for (let itm of traffics) {
+        var max = traffics[0].i;
+        for (var _i = 0, traffics_1 = traffics; _i < traffics_1.length; _i++) {
+            var itm = traffics_1[_i];
             if (itm.i > max) {
                 max = itm.i;
             }
@@ -12,19 +15,20 @@ class HtmlGraph {
             }
         }
         return max;
-    }
-    static renderGraph(traffics, showValue) {
-        const max = this.getMax(traffics);
-        const w = 50;
-        let coef = max == 0 ? 0 : w / max;
-        let result = '<svg style="font-size:16px" width="480" height="' +
+    };
+    HtmlGraph.renderGraph = function (traffics, showValue) {
+        var max = this.getMax(traffics);
+        var w = 50;
+        var coef = max == 0 ? 0 : w / max;
+        var result = '<svg style="font-size:16px" width="480" height="' +
             w +
             '"> <rect width="480" height="' +
             w +
             '" style="fill:none;stroke-width:;stroke:black" />';
-        let i = 0;
-        for (let m of traffics) {
-            let y = w - m.o * coef;
+        var i = 0;
+        for (var _i = 0, traffics_2 = traffics; _i < traffics_2.length; _i++) {
+            var m = traffics_2[_i];
+            var y = w - m.o * coef;
             result +=
                 '<line x1="' +
                     i +
@@ -49,8 +53,9 @@ class HtmlGraph {
                     '" style="stroke:blue;stroke-width:2" />';
             i += 2;
         }
-        let maxValue = showValue(max);
+        var maxValue = showValue(max);
         return result + '<text x="1" y="16" fill="black">' + maxValue + '</text><text x="0" y="15" fill="lime">' + maxValue + '</text></svg>';
-    }
-}
+    };
+    return HtmlGraph;
+}());
 //# sourceMappingURL=HtmlGraph.js.map
