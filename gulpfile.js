@@ -5,7 +5,8 @@ var concat = require('gulp-concat');
 
 gulp.task('default', function () {
     return gulp
-        .src(['./wwwroot/js/HtmlStatusBar.js',
+        .src(['./wwwroot/js/Utils.js',
+            './wwwroot/js/HtmlStatusBar.js',
             './wwwroot/js/HtmlStaticElement.js',
             './wwwroot/js/HtmlGraph.js',
             './wwwroot/js/HtmlServices.js',

@@ -34,6 +34,7 @@ impl GetAction for IndexAction {
                 <link href="/css/bootstrap.css" rel="stylesheet" type="text/css" />
                 <link href="/css/site.css" rel="stylesheet" type="text/css" />
                 <script src="/js/jquery.js"></script>
+                <script src="/js/Utils.js"></script>
                 <script src="/js/HtmlStatusBar.js"></script>
                 <script src="/js/HtmlStaticElement.js"></script>
                 <script src="/js/HtmlGraph.js"></script>

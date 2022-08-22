@@ -35,7 +35,7 @@ impl TrafficHistory {
             history_write_access.remove(0);
         }
 
-        if incoming > 0 || outcoming > 0 || history_write_access.len() > 0 {
+        if !(incoming == 0 && outcoming == 0 && history_write_access.len() == 0) {
             history_write_access.push(TrafficHistoryItem {
                 incoming,
                 outcoming,
@@ -45,7 +45,11 @@ impl TrafficHistory {
 
     pub async fn get_traffic_history(&self) -> Vec<TrafficHistoryItem> {
         let history_write_access = self.history.lock().await;
-        let result: &Vec<TrafficHistoryItem> = history_write_access.as_ref();
-        result.clone()
+        let mut result = Vec::with_capacity(history_write_access.len());
+
+        for itm in history_write_access.iter().rev() {
+            result.push(itm.clone());
+        }
+        result
     }
 }

@@ -11,6 +11,7 @@ class HtmlGraph {
                 max = itm.o;
             }
         }
+        return max;
     }
     static renderGraph(traffics, showValue) {
         const max = this.getMax(traffics);
@@ -23,29 +24,29 @@ class HtmlGraph {
             '" style="fill:none;stroke-width:;stroke:black" />';
         let i = 0;
         for (let m of traffics) {
-            let y = w - m.i * coef;
+            let y = w - m.o * coef;
             result +=
                 '<line x1="' +
-                i +
-                '" y1="' +
-                w +
-                '" x2="' +
-                i +
-                '" y2="' +
-                y +
-                '" style="stroke:green;stroke-width:2" />';
-            y = w - m.o * coef;
+                    i +
+                    '" y1="' +
+                    w +
+                    '" x2="' +
+                    i +
+                    '" y2="' +
+                    y +
+                    '" style="stroke:green;stroke-width:2" />';
+            y = w - m.i * coef;
             i += 2;
             result +=
                 '<line x1="' +
-                i +
-                '" y1="' +
-                w +
-                '" x2="' +
-                i +
-                '" y2="' +
-                y +
-                '" style="stroke:blue;stroke-width:2" />';
+                    i +
+                    '" y1="' +
+                    w +
+                    '" x2="' +
+                    i +
+                    '" y2="' +
+                    y +
+                    '" style="stroke:blue;stroke-width:2" />';
             i += 2;
         }
         let maxValue = showValue(max);

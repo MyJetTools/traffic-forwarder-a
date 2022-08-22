@@ -15,6 +15,8 @@ class HtmlGraph {
                 max = itm.o;
             }
         }
+
+        return max;
     }
 
     public static renderGraph(traffics: ITrafficMoment[], showValue: (number) => string) {
@@ -33,7 +35,7 @@ class HtmlGraph {
 
         let i = 0;
         for (let m of traffics) {
-            let y = w - m.i * coef;
+            let y = w - m.o * coef;
 
             result +=
                 '<line x1="' +
@@ -46,7 +48,7 @@ class HtmlGraph {
                 y +
                 '" style="stroke:green;stroke-width:2" />';
 
-            y = w - m.o * coef;
+            y = w - m.i * coef;
 
             i += 2;
 
